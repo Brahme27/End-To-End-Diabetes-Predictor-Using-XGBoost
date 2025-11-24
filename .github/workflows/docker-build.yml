@@ -1,0 +1,54 @@
+name: Build and Run Diabetes Predictor
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-and-run:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Build Docker image for backend
+        run: |
+          docker build --target backend -t diabetes-predictor-backend:latest .
+
+      - name: Build Docker image for frontend
+        run: |
+          docker build --target frontend -t diabetes-predictor-frontend:latest .
+
+      - name: Run backend container
+        run: |
+          docker run -d --name diabetes-backend -p 8000:8000 diabetes-predictor-backend:latest
+          echo "Backend container started on port 8000"
+
+      - name: Run frontend container
+        run: |
+          docker run -d --name diabetes-frontend -p 8501:8501 --network host diabetes-predictor-frontend:latest
+          echo "Frontend container started on port 8501"
+
+      - name: Wait for containers to be ready
+        run: |
+          echo "Waiting for services to start..."
+          sleep 10
+
+      - name: Check backend health
+        run: |
+          docker logs diabetes-backend
+          echo "Backend container is running"
+
+      - name: Check frontend health
+        run: |
+          docker logs diabetes-frontend
+          echo "Frontend container is running"
+
+      - name: Show running containers
+        run: |
+          docker ps
+          echo "All containers are running successfully!"
