@@ -88,3 +88,4 @@ Diabetes ML Project/
 ## API Endpoints
 -   `GET /health`: Check API health status.
 -   `POST /predict`: Submit health metrics to get a diabetes risk prediction and SHAP values.
+-   
